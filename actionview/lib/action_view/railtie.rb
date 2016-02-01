@@ -7,6 +7,7 @@ module ActionView
     config.action_view = ActiveSupport::OrderedOptions.new
     config.action_view.embed_authenticity_token_in_remote_forms = false
     config.action_view.debug_missing_translation = true
+    config.action_view.default_label_inflector = :humanize
 
     config.eager_load_namespaces << ActionView
 
@@ -14,6 +15,13 @@ module ActionView
       ActiveSupport.on_load(:action_view) do
         ActionView::Helpers::FormTagHelper.embed_authenticity_token_in_remote_forms =
           app.config.action_view.delete(:embed_authenticity_token_in_remote_forms)
+      end
+    end
+
+    initializer "action_view.default_label_inflector" do |app|
+      ActiveSupport.on_load(:action_view) do
+        ActionView::Helpers::FormTagHelper.default_label_inflector =
+          app.config.action_view.delete(:default_label_inflector)
       end
     end
 

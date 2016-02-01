@@ -19,7 +19,7 @@ module ActionView
             content ||= Translator
               .new(object, @object_name, method_and_value, scope: "helpers.label")
               .translate
-            content ||= @method_name.humanize
+            content ||= @method_name.public_send(ActionView::Helpers::FormTagHelper.default_label_inflector)
 
             content
           end
