@@ -29,7 +29,7 @@ module ActiveStorage::Streaming
           type: blob.content_type_for_serving) do |stream|
         ranges = Rack::Utils.get_byte_ranges(range_header, blob.byte_size)
 
-        if ranges.all?(&:blank?)
+        if ranges.blank? || ranges.all?(&:blank?)
           response.status = 416
         elsif ranges.length == 1
           range = ranges.first
@@ -50,13 +50,13 @@ module ActiveStorage::Streaming
             chunk = blob.download_chunk(range)
             content_length += chunk.length
 
-            response.stream.write "--#{boundary}"
-            response.stream.write "Content-Type: #{blob.content_type_for_serving}"
-            response.stream.write "Content-Range: bytes #{range.begin}-#{range.end}/#{blob.byte_size}"
+            response.stream.write "\r\n--#{boundary}\r\n"
+            response.stream.write "Content-Type: #{blob.content_type_for_serving}\r\n"
+            response.stream.write "Content-Range: bytes #{range.begin}-#{range.end}/#{blob.byte_size}\r\n\r\n"
             response.stream.write chunk
           end
 
-          response.stream.write "--#{boundary}--"
+          response.stream.write "\r\n--#{boundary}--\r\n"
           response.headers["Content-Length"] = content_length
         end
       end
