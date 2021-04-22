@@ -41,14 +41,12 @@ module ActiveStorage::Streaming
           response.stream.write chunk
         else
           boundary = SecureRandom.hex
-          content_length = 0
 
           response.headers["Content-Type"] = "Content-Type: multipart/byteranges; boundary=#{boundary}"
           response.status = 206
 
           ranges.compact.each do |range|
             chunk = blob.download_chunk(range)
-            content_length += chunk.length
 
             response.stream.write "\r\n--#{boundary}\r\n"
             response.stream.write "Content-Type: #{blob.content_type_for_serving}\r\n"
@@ -57,7 +55,6 @@ module ActiveStorage::Streaming
           end
 
           response.stream.write "\r\n--#{boundary}--\r\n"
-          response.headers["Content-Length"] = content_length.to_s
         end
       end
     end
