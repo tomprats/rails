@@ -35,7 +35,7 @@ module ActiveStorage::Streaming
           range = ranges.first
           chunk = blob.download_chunk(range)
 
-          response.headers["Content-Length"] = chunk.length
+          response.headers["Content-Length"] = chunk.length.to_s
           response.headers["Content-Range"] = "bytes #{range.begin}-#{range.end}/#{blob.byte_size}"
           response.status = 206
           response.stream.write chunk
@@ -57,7 +57,7 @@ module ActiveStorage::Streaming
           end
 
           response.stream.write "\r\n--#{boundary}--\r\n"
-          response.headers["Content-Length"] = content_length
+          response.headers["Content-Length"] = content_length.to_s
         end
       end
     end
