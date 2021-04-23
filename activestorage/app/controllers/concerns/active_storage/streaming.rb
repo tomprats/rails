@@ -13,7 +13,7 @@ module ActiveStorage::Streaming
     def send_blob_byte_range_data(blob, range_header, disposition: nil) #:doc:
       ranges = Rack::Utils.get_byte_ranges(range_header, blob.byte_size)
 
-      return head(416) if ranges.blank? || ranges.all?(&:blank?)
+      return head(:range_not_satisfiable) if ranges.blank? || ranges.all?(&:blank?)
 
       if ranges.length == 1
         range = ranges.first

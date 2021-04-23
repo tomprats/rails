@@ -29,6 +29,9 @@ class ActiveStorage::Blobs::ProxyControllerTest < ActionDispatch::IntegrationTes
   test "single Byte Range" do
     get rails_storage_proxy_url(create_file_blob(filename: "racecar.jpg")), headers: { "Range" => "bytes=5-9" }
     assert_response :partial_content
+    assert_equal "5", response.headers["Content-Length"]
+    assert_equal "bytes 5-9/1124062", response.headers["Content-Range"]
+    assert_equal "image/jpeg", response.headers["Content-Type"]
     assert_equal " Exif", response.body
   end
 
@@ -42,6 +45,7 @@ class ActiveStorage::Blobs::ProxyControllerTest < ActionDispatch::IntegrationTes
     SecureRandom.stub :hex, boundary do
       get rails_storage_proxy_url(create_file_blob(filename: "racecar.jpg")), headers: { "Range" => "bytes=5-9,13-17" }
       assert_response :partial_content
+      assert_equal "252", response.headers["Content-Length"]
       assert_equal "multipart/byteranges; boundary=#{boundary}", response.headers["Content-Type"]
       assert_equal(
         [
